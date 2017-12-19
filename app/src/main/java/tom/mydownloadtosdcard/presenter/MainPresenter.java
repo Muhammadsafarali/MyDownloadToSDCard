@@ -1,5 +1,6 @@
 package tom.mydownloadtosdcard.presenter;
 
+import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
@@ -48,6 +49,103 @@ public class MainPresenter implements Presenter<MainMvpView> {
         int Timeout = 100;
         boolean forceClaim = true;
 
+        checkDeviceNull();
+
+        if (device != null && mUsbManager != null) {
+            int epIndex = 0;
+            UsbInterface intf = device.getInterface(epIndex);
+//            UsbEndpoint endpoint = intf.getEndpoint(0 );
+            UsbDeviceConnection connection = mUsbManager.openDevice(device);
+
+            MainPresenter.this.mainMvpView._log("Interface Count: " + device.getInterfaceCount());
+            MainPresenter.this.mainMvpView._log("Using " + String.format("%04X:%04X", device.getVendorId(), device.getProductId()));
+
+
+            if (connection.claimInterface(intf, forceClaim)) {
+//                Log.e(LOG_TAG, "open SUCCESS");
+                UsbEndpoint epIN = null;
+                UsbEndpoint epOUT = null;
+                MainPresenter.this.mainMvpView._log("usb open SUCCESS");
+                MainPresenter.this.mainMvpView._log("EP: " + String.format("0x%02X", intf.getEndpoint(epIndex).getAddress()));
+
+                if (intf.getEndpoint(epIndex).getType() == UsbConstants.USB_ENDPOINT_XFER_BULK) {
+                    MainPresenter.this.mainMvpView._log("Bulk Endpoint");
+
+
+                    if (intf.getEndpoint(epIndex).getDirection() == UsbConstants.USB_DIR_IN) {
+                        epIN = intf.getEndpoint(epIndex);
+                        MainPresenter.this.mainMvpView._log("epIN");
+                    }
+                    else {
+                        epOUT = intf.getEndpoint(epIndex);
+                        MainPresenter.this.mainMvpView._log("epOUT");
+                    }
+                } else {
+                    MainPresenter.this.mainMvpView._log("Not Bulk");
+                }
+
+                if (epOUT == null || epIN == null) {
+                    throw new IllegalArgumentException("not all endpoints found");
+                }
+//                for (;;) {// this is the main loop for transferring
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    String get = "$fDump G" + "\n";
+                    MainPresenter.this.mainMvpView._log("Sending: " + get);
+
+                    byte[] by = get.getBytes();
+
+                    // This is where it sends
+                    MainPresenter.this.mainMvpView._log("out " + connection.bulkTransfer(epOUT, by, by.length, 500));
+
+                    // This is where it is meant to receive
+                    byte[] buffer = new byte[4096];
+
+                    StringBuilder str = new StringBuilder();
+
+                    if (connection.bulkTransfer(epIN, buffer, 4096, 500) >= 0) {
+                        for (int i = 2; i < 4096; i++) {
+                            if (buffer[i] != 0) {
+                                str.append((char) buffer[i]);
+                            } else {
+                                MainPresenter.this.mainMvpView._log(str.toString());
+                                break;
+                            }
+                        }
+
+                    }
+                    // this shows the complete string
+                    MainPresenter.this.mainMvpView._log(str.toString());
+
+//                    if (mStop) {
+//                        mStopped = true;
+//                        return;
+//                    }
+//                    MainPresenter.this.mainMvpView._log("sent " + counter);
+//                    counter++;
+//                    counter = (byte) (counter % 16);
+//                }
+
+//                byte[] init = {0x00,0x00,0x00,0x00,0x05,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
+                // 	length of data transferred (or zero) for success, or -1 for failure
+//                int x = connection.bulkTransfer(endpoint,init, init.length, Timeout);
+//                Log.e(LOG_TAG, "BulkTransfer returned " + x);
+
+//                MainPresenter.this.mainMvpView._log("init.length: " + init.length);
+//                MainPresenter.this.mainMvpView._log("BulkTransfer returned: " + x);
+            } else {
+                MainPresenter.this.mainMvpView._log("usb open FAIL");
+                return;
+            }
+        }
+    }
+
+    private void checkDeviceNull() {
         if (device != null)
             MainPresenter.this.mainMvpView._log("device != null");
         else
@@ -57,28 +155,6 @@ public class MainPresenter implements Presenter<MainMvpView> {
             MainPresenter.this.mainMvpView._log("mUsbManager != null");
         else
             MainPresenter.this.mainMvpView._log("mUsbManager == null");
-
-        if (device != null && mUsbManager != null) {
-            MainPresenter.this.mainMvpView._log("device != null && mUsbManager != null");
-            UsbInterface intf = device.getInterface(0);
-            UsbEndpoint endpoint = intf.getEndpoint(0 );
-            UsbDeviceConnection connection = mUsbManager.openDevice(device);
-//            MainPresenter.this.mainMvpView._log("usb open SUCCESS");
-
-            if (connection != null && connection.claimInterface(intf, forceClaim)) {
-//                Log.e(LOG_TAG, "open SUCCESS");
-                MainPresenter.this.mainMvpView._log("usb open SUCCESS");
-
-                byte[] init = {0x00,0x00,0x00,0x00,0x05,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-
-                // 	length of data transferred (or zero) for success, or -1 for failure
-                int x = connection.bulkTransfer(endpoint,init, init.length, Timeout);
-//                Log.e(LOG_TAG, "BulkTransfer returned " + x);
-
-                MainPresenter.this.mainMvpView._log("init.length: " + init.length);
-                MainPresenter.this.mainMvpView._log("BulkTransfer returned: " + x);
-            }
-        }
     }
 
     public void test() {
