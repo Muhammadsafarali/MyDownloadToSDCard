@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="tom.mydownloadtosdcard.view.MainActivity">
+
+    <TextView
+        android:id="@+id/tvMyLog"
+        android:textAllCaps="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Log" />
+
+    <Button
+        android:id="@+id/btnGetUsbDevice"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:text="Get USB Device"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btnDownloadFile"
+        android:text="Download File"
+        android:textAllCaps="false"
+        android:layout_below="@id/btnGetUsbDevice"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btnGetToken"
+        android:text="Get Token"
+        android:textAllCaps="false"
+        android:layout_below="@id/btnDownloadFile"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+    <ListView
+        android:layout_below="@id/btnGetToken"
+        android:id="@+id/list_threading_log"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        />
+
+</RelativeLayout>
