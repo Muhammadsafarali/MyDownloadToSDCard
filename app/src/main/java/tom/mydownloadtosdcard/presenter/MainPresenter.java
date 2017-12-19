@@ -23,6 +23,8 @@ public class MainPresenter implements Presenter<MainMvpView> {
 
     private static final String LOG_TAG = "MainPresenter";
 
+    public UsbManager mUsbManager;
+    public UsbDevice device;
     public MainMvpView mainMvpView;
     private Subscription subscription;
 
@@ -38,24 +40,43 @@ public class MainPresenter implements Presenter<MainMvpView> {
         if (subscription != null) subscription.unsubscribe();
     }
 
-    public void writeToUsb(UsbDevice device, UsbManager mUsbManager) {
+    public void writeToUsb() {
 
-        if (subscription != null) subscription.unsubscribe();
-        myApplication application = myApplication.get(mainMvpView.getContext());
+//        if (subscription != null) subscription.unsubscribe();
+//        myApplication application = myApplication.get(mainMvpView.getContext());
 
         int Timeout = 100;
         boolean forceClaim = true;
 
+        if (device != null)
+            MainPresenter.this.mainMvpView._log("device != null");
+        else
+            MainPresenter.this.mainMvpView._log("device == null");
+
+        if (mUsbManager != null)
+            MainPresenter.this.mainMvpView._log("mUsbManager != null");
+        else
+            MainPresenter.this.mainMvpView._log("mUsbManager == null");
+
         if (device != null && mUsbManager != null) {
+            MainPresenter.this.mainMvpView._log("device != null && mUsbManager != null");
             UsbInterface intf = device.getInterface(0);
-            UsbEndpoint endpoint = intf.getEndpoint(2 );
+            UsbEndpoint endpoint = intf.getEndpoint(0 );
             UsbDeviceConnection connection = mUsbManager.openDevice(device);
+//            MainPresenter.this.mainMvpView._log("usb open SUCCESS");
+
             if (connection != null && connection.claimInterface(intf, forceClaim)) {
-                Log.e(LOG_TAG, "open SUCCESS");
+//                Log.e(LOG_TAG, "open SUCCESS");
+                MainPresenter.this.mainMvpView._log("usb open SUCCESS");
 
                 byte[] init = {0x00,0x00,0x00,0x00,0x05,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
+                // 	length of data transferred (or zero) for success, or -1 for failure
                 int x = connection.bulkTransfer(endpoint,init, init.length, Timeout);
-                Log.e(LOG_TAG, "BulkTransfer returned " + x);
+//                Log.e(LOG_TAG, "BulkTransfer returned " + x);
+
+                MainPresenter.this.mainMvpView._log("init.length: " + init.length);
+                MainPresenter.this.mainMvpView._log("BulkTransfer returned: " + x);
             }
         }
     }
@@ -80,7 +101,7 @@ public class MainPresenter implements Presenter<MainMvpView> {
                     }
 
                 });*/
-        mainMvpView.showMessage("message");
+//        mainMvpView.showMessage("message");
     }
 
     public void startLongOperation() {
@@ -104,13 +125,15 @@ public class MainPresenter implements Presenter<MainMvpView> {
     }
 
     private void _doSomeLongOperation_thatBlocksCurrentThread() {
-        MainPresenter.this.mainMvpView._log("performing long operation");
+//        MainPresenter.this.mainMvpView._log("performing long operation: " + str);
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            Log.e("MainPresenter","Operation was interrupted");
-        }
+//        try {
+//            Thread.sleep(3000);
+//
+//        } catch (InterruptedException e) {
+//            Log.e("MainPresenter","Operation was interrupted");
+//        }
+        writeToUsb();
     }
 
     public DisposableObserver<Boolean> _getDisposableObserver() {
@@ -124,8 +147,8 @@ public class MainPresenter implements Presenter<MainMvpView> {
 
             @Override
             public void onError(Throwable e) {
-               Log.e("MainPresenter", "Error in RxJava Demo concurrency: " + e.getMessage());
-                MainPresenter.this.mainMvpView._log(String.format("Boo! Error %s", e.getMessage()));
+//               Log.e("MainPresenter", "Error in RxJava Demo concurrency: " + e.getMessage());
+                MainPresenter.this.mainMvpView._log(String.format("Boo! Error %s", e.fillInStackTrace()));
 //                _progress.setVisibility(View.INVISIBLE);
             }
 

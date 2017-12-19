@@ -6,6 +6,6 @@ package tom.mydownloadtosdcard.view;
 
 public interface MainMvpView extends MvpView {
 
-    void showMessage(String msg);
+//    void showMessage(String msg);
     void _log(String s);
 }

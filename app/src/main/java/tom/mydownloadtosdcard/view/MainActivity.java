@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity implements Observer, MainMvp
     private TextView textLog;
     private HashMap<String, UsbDevice> deviceList;
     private PendingIntent mPermissionIntent;
-    private UsbManager mUsbManager;
-    private UsbDevice device;
+//    private UsbManager mUsbManager;
+//    private UsbDevice device;
     private UsbDeviceConnection mConnection;
     private String urlFile = "http://cloud.dubllik.ru/u/files/iusers/c4ca4238a0b923820dcc509a6f75849b/model_20171006_11-19-26.ply";
     private MainPresenter presenter;
@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity implements Observer, MainMvp
 
     // 2) UsbManager
     private void getUsbDevice() {
-        mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        this.deviceList = mUsbManager.getDeviceList();
+        presenter.mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        this.deviceList = presenter.mUsbManager.getDeviceList();
         if (deviceList != null && deviceList.size() > 0) {
 //            String resultText = new String();
 //            for (String n :
@@ -147,13 +147,13 @@ public class MainActivity extends AppCompatActivity implements Observer, MainMvp
             // Получить device
             Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
             while (deviceIterator.hasNext()) {
-                device = deviceIterator.next();
-                if (device != null) {
-                    textLog.setText("Device: " + device.getDeviceName());
+                presenter.device = deviceIterator.next();
+                if (presenter.device != null) {
+                    textLog.setText("Device: " + presenter.device.getDeviceName());
 //                    mUsbManager.requestPermission(device, mPermissionIntent);
                 }
             }
-            mUsbManager.requestPermission(device, mPermissionIntent);
+            presenter.mUsbManager.requestPermission(presenter.device, mPermissionIntent);
         } else {
             textLog.setText("deviceList: null");
         }
@@ -168,10 +168,10 @@ public class MainActivity extends AppCompatActivity implements Observer, MainMvp
     }
 
 
-    @Override
-    public void showMessage(String msg) {
-        Snackbar.make(mainLayout, msg, Snackbar.LENGTH_LONG).show();
-    }
+//    @Override
+//    public void showMessage(String msg) {
+//        Snackbar.make(mainLayout, msg, Snackbar.LENGTH_LONG).show();
+//    }
 
     @Override
     public Context getContext() {
