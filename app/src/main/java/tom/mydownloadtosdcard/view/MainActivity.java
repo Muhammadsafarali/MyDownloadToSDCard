@@ -11,6 +11,7 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -129,6 +130,10 @@ public class MainActivity extends AppCompatActivity implements Observer, MainMvp
         mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         registerReceiver(mUsbReceiver, filter);
+
+//        IBinder b = ServiceManager.getService(USB_SERVICE);
+//        IUsbManager service = IUsbManager.Stub.asInterface(b);
+//        service.grantDevicePermission(mDevice, uid);
     }
 
 

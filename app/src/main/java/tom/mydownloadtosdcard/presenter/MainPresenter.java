@@ -68,20 +68,20 @@ public class MainPresenter implements Presenter<MainMvpView> {
                 MainPresenter.this.mainMvpView._log("usb open SUCCESS");
                 MainPresenter.this.mainMvpView._log("EP: " + String.format("0x%02X", intf.getEndpoint(epIndex).getAddress()));
 
-                if (intf.getEndpoint(epIndex).getType() == UsbConstants.USB_ENDPOINT_XFER_BULK) {
-                    MainPresenter.this.mainMvpView._log("Bulk Endpoint");
+                for (int i = 0; i < intf.getEndpointCount(); i++) {
+                    if (intf.getEndpoint(epIndex).getType() == UsbConstants.USB_ENDPOINT_XFER_BULK) {
+                        MainPresenter.this.mainMvpView._log("Bulk Endpoint");
 
-
-                    if (intf.getEndpoint(epIndex).getDirection() == UsbConstants.USB_DIR_IN) {
-                        epIN = intf.getEndpoint(epIndex);
-                        MainPresenter.this.mainMvpView._log("epIN");
+                        if (intf.getEndpoint(epIndex).getDirection() == UsbConstants.USB_DIR_IN) {
+                            epIN = intf.getEndpoint(epIndex);
+                            MainPresenter.this.mainMvpView._log("epIN");
+                        } else {
+                            epOUT = intf.getEndpoint(epIndex);
+                            MainPresenter.this.mainMvpView._log("epOUT");
+                        }
+                    } else {
+                        MainPresenter.this.mainMvpView._log("Not Bulk");
                     }
-                    else {
-                        epOUT = intf.getEndpoint(epIndex);
-                        MainPresenter.this.mainMvpView._log("epOUT");
-                    }
-                } else {
-                    MainPresenter.this.mainMvpView._log("Not Bulk");
                 }
 
                 if (epOUT == null || epIN == null) {
